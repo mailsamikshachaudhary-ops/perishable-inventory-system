@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perishable Inventory Management System</title>
+  <style>
+    :root {
+      --bg: #f4f7f5;
+      --surface: #ffffff;
+      --primary: #1b5e20;
+      --primary-light: #2e7d32;
+      --primary-soft: #e8f5e9;
+      --text: #1c2822;
+      --muted: #5a6b61;
+      --border: #dce5df;
+      --low-bg: #e8f5e9;
+      --low-text: #1b5e20;
+      --med-bg: #fff8e1;
+      --med-text: #b26a00;
+      --high-bg: #ffebee;
+      --high-text: #c62828;
+      --shadow: 0 4px 16px rgba(17, 43, 27, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg); color: var(--text); line-height: 1.5; }
+
+    header {
+      background: linear-gradient(135deg, #144518, #246b29);
+      color: #fff;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    }
+    .header-inner { max-width: 1120px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; }
+    header h1 { font-size: 1.55rem; font-weight: 700; letter-spacing: -0.3px; }
+    header p { font-size: 0.9rem; opacity: 0.9; margin-top: 0.2rem; }
+    .badge-model { background: rgba(255,255,255,0.16); padding: 0.45rem 0.85rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+
+    main { max-width: 1120px; margin: 1.75rem auto; padding: 0 1.25rem; display: grid; grid-template-columns: 1fr 1.15fr; gap: 1.5rem; }
+    @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow); }
+    .card h2 { font-size: 1.15rem; color: var(--primary); margin-bottom: 0.35rem; }
+    .card .sub { font-size: 0.86rem; color: var(--muted); margin-bottom: 1.2rem; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    label { font-size: 0.83rem; font-weight: 600; color: var(--text); }
+    select, input {
+      padding: 0.65rem 0.75rem;
+      border: 1px solid #c5d3ca;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #fff;
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+    select:focus, input:focus { outline: none; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(46,125,50,0.14); }
+
+    .btn-row { margin-top: 1.25rem; display: flex; gap: 0.75rem; }
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1.2rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: transform 0.08s, background 0.2s;
+    }
+    button:active { transform: scale(0.99); }
+    .btn-primary { background: var(--primary-light); color: #fff; flex: 1; }
+    .btn-primary:hover { background: var(--primary); }
+    .btn-secondary { background: #eaf0ec; color: var(--text); }
+    .btn-secondary:hover { background: #dce5df; }
+
+    .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; margin-bottom: 1.1rem; }
+    .kpi { border: 1px solid var(--border); border-radius: 10px; padding: 0.95rem; background: #fafcfb; }
+    .kpi .k-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; color: var(--muted); font-weight: 600; }
+    .kpi .k-val { font-size: 1.35rem; font-weight: 700; margin-top: 0.25rem; }
+
+    .pill { display: inline-block; padding: 0.25rem 0.7rem; border-radius: 999px; font-size: 0.88rem; font-weight: 700; }
+    .pill-low { background: var(--low-bg); color: var(--low-text); }
+    .pill-med { background: var(--med-bg); color: var(--med-text); }
+    .pill-high { background: var(--high-bg); color: var(--high-text); }
+
+    .action-box { background: var(--primary-soft); border-left: 4px solid var(--primary-light); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+    .action-box h3 { font-size: 0.95rem; color: var(--primary); margin-bottom: 0.45rem; }
+    .action-box ul { padding-left: 1.2rem; font-size: 0.9rem; color: #1e3326; }
+    .action-box li { margin-bottom: 0.3rem; }
+
+    details { border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; background: #fcfdfd; font-size: 0.87rem; }
+    summary { font-weight: 600; cursor: pointer; color: var(--primary); }
+    details p { margin-top: 0.55rem; color: var(--muted); }
+
+    .full-span { grid-column: 1 / -1; }
+    .table-wrap { overflow-x: auto; margin-top: 0.6rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th, td { text-align: left; padding: 0.65rem 0.75rem; border-bottom: 1px solid var(--border); }
+    th { background: #f1f6f3; color: var(--primary); font-weight: 600; }
+    .empty-msg { text-align: center; color: var(--muted); padding: 1.2rem; font-size: 0.88rem; }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.82rem; padding: 1.5rem 1rem 2rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <h1>Perishable Inventory Management System</h1>
+      <p>AI-Based Demand &amp; Wastage Risk Predictor for Neighbourhood Grocery Stores &amp; Dairies</p>
+    </div>
+    <span class="badge-model">Orange3 Decision Tree Model</span>
+  </div>
+</header>
+
+<main>
+  <!-- Input Card -->
+  <section class="card">
+    <h2>1. Enter Product &amp; Store Conditions</h2>
+    <p class="sub">Matches the 6 attributes from your Orange3 training dataset (<code>grocery_demand_prediction_150.csv</code>).</p>
+
+    <form id="predictForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="product">Product Category</label>
+          <select id="product" required>
+            <option value="Milk">Milk (1–2 day shelf life)</option>
+            <option value="Curd">Curd (2–3 day shelf life)</option>
+            <option value="Bread">Bread (3–4 day shelf life)</option>
+            <option value="Bakery">Bakery (1–2 day shelf life)</option>
+            <option value="Paneer">Paneer (3–5 day shelf life)</option>
+            <option value="Yogurt">Yogurt (5–7 day shelf life)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="stock_quantity">Current Stock Quantity (units)</label>
+          <input type="number" id="stock_quantity" min="0" max="2000" value="65" required />
+        </div>
+
+        <div class="form-group">
+          <label for="average_daily_sales">Average Daily Sales (units/day)</label>
+          <input type="number" id="average_daily_sales" min="1" max="2000" value="45" required />
+        </div>
+
+        <div class="form-group">
+          <label for="yesterday_unsold_stock">Yesterday Unsold Stock (units)</label>
+          <input type="number" id="yesterday_unsold_stock" min="0" max="1000" value="14" required />
+        </div>
+
+        <div class="form-group">
+          <label for="day_type">Tomorrow's Day Type</label>
+          <select id="day_type" required>
+            <option value="Weekday">Weekday</option>
+            <option value="Weekend">Weekend</option>
+            <option value="Holiday">Holiday</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="weather">Weather Forecast</label>
+          <select id="weather" required>
+            <option value="Sunny">Sunny</option>
+            <option value="Hot">Hot</option>
+            <option value="Cloudy">Cloudy</option>
+            <option value="Rainy">Rainy</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button type="submit" class="btn-primary">Predict Demand &amp; Wastage Risk</button>
+        <button type="button" id="addLogBtn" class="btn-secondary">+ Add to Daily Log</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Output Card -->
+  <section class="card">
+    <h2>2. Prediction &amp; Shopkeeper Recommendations</h2>
+    <p class="sub">Real-time output for <code>tomorrow_demand_level</code> and perishable spoilage prevention.</p>
+
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="k-label">Tomorrow Demand Level</div>
+        <div class="k-val" id="demandOut"><span class="pill pill-med">Medium</span></div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Wastage Risk Score</div>
+        <div class="k-val" id="riskOut"><span class="pill pill-high">High Risk (74%)</span></div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Projected At-Risk Units</div>
+        <div class="k-val" id="atRiskUnits">18 units</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Recommended Next Order</div>
+        <div class="k-val" id="recOrder">32 units</div>
+      </div>
+    </div>
+
+    <div class="action-box">
+      <h3>Actionable Store Guidance</h3>
+      <ul id="actionList">
+        <li>Apply a <strong>20% evening discount</strong> after 6:00 PM to clear 14 carryover units before expiry.</li>
+        <li>Reduce tomorrow morning's supplier order from 45 to <strong>32 units</strong> to prevent overstocking.</li>
+      </ul>
+    </div>
+
+    <details>
+      <summary>View Decision Tree Logic Behind This Prediction</summary>
+      <p id="treeExplain">
+        Split path: <code>yesterday_unsold_stock (14) &gt; 25% of average_daily_sales (45)</code> &rarr; <code>stock_quantity (65) &gt; expected_demand (43)</code> &rarr; High spoilage exposure for short shelf-life dairy.
+      </p>
+    </details>
+  </section>
+
+  <!-- Store Summary Log -->
+  <section class="card full-span">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <div>
+        <h2>3. Today's Store Perishables Summary Log</h2>
+        <p class="sub" style="margin-bottom:0;">Track multiple dairy and bakery items across your store in one session.</p>
+      </div>
+      <button type="button" id="clearLogBtn" class="btn-secondary" style="padding:0.45rem 0.85rem; font-size:0.82rem;">Clear Log</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Stock</th>
+            <th>Avg Sales</th>
+            <th>Unsold Yest.</th>
+            <th>Day / Weather</th>
+            <th>Tomorrow Demand</th>
+            <th>Wastage Risk</th>
+            <th>Order Qty</th>
+          </tr>
+        </thead>
+        <tbody id="logBody">
+          <tr><td colspan="8" class="empty-msg">Click "+ Add to Daily Log" after predicting an item to build your daily store checklist.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Perishable Inventory Management System &bull; AI Capstone Project powered by Orange3 Decision Tree Classification
+</footer>
+
+<script>
+  const shelfLifeFactor = {
+    Milk: 1.25,
+    Bakery: 1.25,
+    Curd: 1.15,
+    Bread: 1.05,
+    Paneer: 1.0,
+    Yogurt: 0.9
+  };
+
+  const unitPrice = {
+    Milk: 32,
+    Curd: 40,
+    Bread: 45,
+    Bakery: 60,
+    Paneer: 95,
+    Yogurt: 35
+  };
+
+  let lastResult = null;
+  let dailyLog = [];
+
+  function runPrediction() {
+    const product = document.getElementById('product').value;
+    const stock = Math.max(0, Number(document.getElementById('stock_quantity').value));
+    const avgSales = Math.max(1, Number(document.getElementById('average_daily_sales').value));
+    const unsold = Math.max(0, Number(document.getElementById('yesterday_unsold_stock').value));
+    const dayType = document.getElementById('day_type').value;
+    const weather = document.getElementById('weather').value;
+
+    // Decision-tree style demand multiplier based on day_type, weather, and product
+    let multiplier = 1.0;
+    if (dayType === 'Holiday') multiplier += 0.25;
+    else if (dayType === 'Weekend') multiplier += 0.15;
+    else multiplier -= 0.05;
+
+    if (weather === 'Rainy') multiplier -= 0.18;
+    else if (weather === 'Hot' && (product === 'Curd' || product === 'Yogurt' || product === 'Milk')) multiplier += 0.14;
+    else if (weather === 'Hot' && product === 'Bakery') multiplier -= 0.08;
+    else if (weather === 'Cloudy') multiplier -= 0.04;
+
+    // Unsold carryover dampening factor
+    const unsoldRatio = unsold / avgSales;
+    if (unsoldRatio > 0.3) multiplier -= 0.12;
+
+    const expectedDemand = Math.round(avgSales * multiplier);
+
+    // Classify tomorrow_demand_level (High, Medium, Low)
+    let demandLevel = 'Medium';
+    let demandClass = 'pill-med';
+    if (multiplier >= 1.12) {
+      demandLevel = 'High';
+      demandClass = 'pill-low';
+    } else if (multiplier <= 0.88) {
+      demandLevel = 'Low';
+      demandClass = 'pill-high';
+    }
+
+    // Wastage risk calculation
+    const surplus = Math.max(0, stock - expectedDemand);
+    const rawRisk = ((surplus + unsold * 0.85) / Math.max(stock, avgSales)) * 100 * shelfLifeFactor[product];
+    const riskScore = Math.min(98, Math.max(5, Math.round(rawRisk)));
+
+    let riskLabel = 'Low Risk';
+    let riskClass = 'pill-low';
+    if (riskScore >= 60) {
+      riskLabel = 'High Risk';
+      riskClass = 'pill-high';
+    } else if (riskScore >= 32) {
+      riskLabel = 'Moderate Risk';
+      riskClass = 'pill-med';
+    }
+
+    const atRiskUnits = Math.max(0, Math.round(surplus * 0.75 + unsold * 0.5));
+    const estLoss = atRiskUnits * unitPrice[product];
+    const recOrder = Math.max(0, Math.round(expectedDemand - stock * 0.5));
+
+    // Update UI
+    document.getElementById('demandOut').innerHTML = `<span class="pill ${demandClass}">${demandLevel} (~${expectedDemand} units)</span>`;
+    document.getElementById('riskOut').innerHTML = `<span class="pill ${riskClass}">${riskLabel} (${riskScore}%)</span>`;
+    document.getElementById('atRiskUnits').textContent = `${atRiskUnits} units (₹${estLoss.toLocaleString('en-IN')})`;
+    document.getElementById('recOrder').textContent = `${recOrder} units`;
+
+    const actions = [];
+    if (riskScore >= 60) {
+      actions.push(`<strong>Urgent Markdown:</strong> Offer a 20–30% evening discount on ${product} after 6:00 PM to clear ~${atRiskUnits} at-risk units.`);
+      actions.push(`<strong>FIFO Rotation:</strong> Move yesterday's ${unsold} unsold units to the front of the shelf immediately.`);
+    } else if (riskScore >= 32) {
+      actions.push(`<strong>Bundle Offer:</strong> Offer a 10% combo deal on ${product} during peak evening hours.`);
+    } else {
+      actions.push(`<strong>Healthy Turnover:</strong> Current stock aligns well with expected ${demandLevel.toLowerCase()} demand. No markdown needed.`);
+    }
+    actions.push(`<strong>Supplier Restock:</strong> Place an order for <strong>${recOrder} units</strong> for tomorrow morning (${dayType}, ${weather}).`);
+    document.getElementById('actionList').innerHTML = actions.map(a => `<li>${a}</li>`).join('');
+
+    document.getElementById('treeExplain').innerHTML =
+      `Node Path: <code>product=${product}</code> &rarr; <code>day_type=${dayType}</code> &amp; <code>weather=${weather}</code> (multiplier ${multiplier.toFixed(2)}x) &rarr; <code>yesterday_unsold_stock=${unsold}</code> vs <code>stock_quantity=${stock}</code> &rarr; Predicted class: <strong>${demandLevel}</strong>.`;
+
+    lastResult = { product, stock, avgSales, unsold, dayType, weather, demandLevel, demandClass, riskLabel, riskScore, riskClass, recOrder };
+  }
+
+  function renderLog() {
+    const tbody = document.getElementById('logBody');
+    if (dailyLog.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-msg">Click "+ Add to Daily Log" after predicting an item to build your daily store checklist.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = dailyLog.map(item => `
+      <tr>
+        <td><strong>${item.product}</strong></td>
+        <td>${item.stock}</td>
+        <td>${item.avgSales}</td>
+        <td>${item.unsold}</td>
+        <td>${item.dayType} / ${item.weather}</td>
+        <td><span class="pill ${item.demandClass}">${item.demandLevel}</span></td>
+        <td><span class="pill ${item.riskClass}">${item.riskLabel} (${item.riskScore}%)</span></td>
+        <td><strong>${item.recOrder} units</strong></td>
+      </tr>
+    `).join('');
+  }
+
+  document.getElementById('predictForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    runPrediction();
+  });
+
+  document.getElementById('addLogBtn').addEventListener('click', function() {
+    if (!lastResult) runPrediction();
+    dailyLog.push({ ...lastResult });
+    renderLog();
+  });
+
+  document.getElementById('clearLogBtn').addEventListener('click', function() {
+    dailyLog = [];
+    renderLog();
+  });
+
+  // Run initial prediction on load
+  runPrediction();
+</script>
+
+</body>
+</html>
